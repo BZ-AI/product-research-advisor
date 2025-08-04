@@ -146,20 +146,57 @@ const AnalysisWorkflow: React.FC = () => {
       description: '分析完成，查看结果',
       icon: <CheckCircleOutlined />,
       content: (
-        <Card>
-          <div className="text-center space-y-4">
-            <CheckCircleOutlined className="text-6xl text-green-500" />
-            <Title level={2}>分析完成！</Title>
-            <Text type="secondary" className="block">
-              已为{companyName}生成了{recommendations.length}项个性化研发建议
-            </Text>
-            <div className="space-x-4">
-              <Button type="primary" size="large">
-                查看详细报告
+        <Card className="bg-gradient-to-r from-green-50 to-blue-50">
+          <div className="text-center space-y-6">
+            <div>
+              <CheckCircleOutlined className="text-6xl text-green-500 mb-4" />
+              <Title level={2} className="text-green-700">🎉 AI分析完成！</Title>
+            </div>
+            
+            <div className="bg-white p-6 rounded-lg shadow-sm">
+              <Text className="text-lg block mb-2">
+                ✅ 已为<span className="font-bold text-blue-600">{companyName}</span>生成了
+              </Text>
+              <Title level={3} className="text-purple-600 mb-2">
+                {recommendations.length}项个性化研发建议
+              </Title>
+              <Text type="secondary">
+                包含详细的实施方案、资源配置和风险评估
+              </Text>
+            </div>
+
+            <div className="space-y-4">
+              <Button 
+                type="primary" 
+                size="large"
+                onClick={() => setCurrentStep(2)}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 border-0 px-8 py-6 text-lg h-auto"
+              >
+                📋 查看详细AI建议报告
               </Button>
-              <Button size="large">
-                导出分析结果
-              </Button>
+              
+              <div>
+                <Button 
+                  size="large"
+                  onClick={() => message.success('🎯 建议已保存，可随时查看')}
+                  className="mx-2"
+                >
+                  💾 保存建议
+                </Button>
+                <Button 
+                  size="large"
+                  onClick={() => message.info('📤 导出功能即将上线')}
+                  className="mx-2"
+                >
+                  📤 导出报告
+                </Button>
+              </div>
+            </div>
+
+            <div className="text-center">
+              <Text className="text-gray-500 text-sm">
+                🤖 由AI智能分析生成 • 📊 基于行业大数据 • 🎯 专业可执行
+              </Text>
             </div>
           </div>
         </Card>

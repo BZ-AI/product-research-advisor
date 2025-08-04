@@ -28,14 +28,35 @@ export class AIService {
 
   constructor(config: AIServiceConfig = {}) {
     this.config = {
-      apiKey: config.apiKey || process.env.REACT_APP_OPENAI_API_KEY,
-      baseURL: config.baseURL || 'https://api.openai.com/v1',
-      model: config.model || 'gpt-4',
+      apiKey: config.apiKey || process.env.REACT_APP_OPENAI_API_KEY || 'your-api-key-here',
+      baseURL: config.baseURL || this.getBaseURL(config.model || 'gpt-3.5-turbo'),
+      model: config.model || 'gpt-3.5-turbo', // 使用更便宜的模型
       ...config
     };
     
-    // 如果没有API密钥，使用演示模式
-    this.isDemo = !this.config.apiKey;
+    // MVP版本：优先使用真实AI，API密钥可以后台配置
+    this.isDemo = false; // 强制启用真实AI模式
+  }
+
+  // 根据模型自动选择API端点
+  private getBaseURL(model: string): string {
+    if (model.startsWith('claude')) {
+      return 'https://api.anthropic.com/v1';
+    } else if (model.startsWith('gemini')) {
+      return 'https://generativelanguage.googleapis.com/v1';
+    } else {
+      return 'https://api.openai.com/v1';
+    }
+  }
+
+  // 动态切换AI模型
+  switchModel(model: string, apiKey?: string) {
+    this.config.model = model;
+    this.config.baseURL = this.getBaseURL(model);
+    if (apiKey) {
+      this.config.apiKey = apiKey;
+      this.isDemo = false;
+    }
   }
 
   async generateResponse(request: AnalysisRequest): Promise<AIResponse> {
@@ -55,7 +76,21 @@ export class AIService {
           messages: [
             {
               role: 'system',
-              content: '你是一个专业的产品研发顾问，专门为企业提供基于行业分析的研发建议。请用中文回答，内容要专业、具体、可操作。'
+              content: `你是广东格绿朗节能科技有限公司的专业产品研发顾问，专门为遮阳蓬行业提供研发建议。
+
+要求：
+1. 回答必须专业、具体、可执行
+2. 基于真实的行业数据和市场趋势
+3. 提供具体的技术方案和实施步骤
+4. 包含成本估算和时间规划
+5. 考虑企业实际能力和资源限制
+6. 用中文回答，语言专业但易懂
+
+请确保每个建议都有：
+- 具体的实施方案
+- 预期的投资回报
+- 详细的风险评估
+- 明确的成功指标`
             },
             {
               role: 'user',

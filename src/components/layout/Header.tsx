@@ -1,12 +1,15 @@
-import React from 'react';
-import { Layout, Button, Avatar, Dropdown, Space, Badge } from 'antd';
-import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Layout, Button, Avatar, Dropdown, Space, Badge, Modal } from 'antd';
+import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined, RobotOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import AIStatusIndicator from '../common/AIStatusIndicator';
+import AIModelSelector from '../common/AIModelSelector';
 
 const { Header: AntHeader } = Layout;
 
 const Header: React.FC = () => {
+  const [showAISettings, setShowAISettings] = useState(false);
+
   const userMenuItems: MenuProps['items'] = [
     {
       key: 'profile',
@@ -36,6 +39,14 @@ const Header: React.FC = () => {
           产品研发建议平台
         </h1>
         <AIStatusIndicator />
+        <Button
+          type="text"
+          icon={<RobotOutlined />}
+          onClick={() => setShowAISettings(true)}
+          className="text-blue-600"
+        >
+          AI设置
+        </Button>
       </div>
       
       <div className="flex items-center space-x-4">
@@ -54,6 +65,17 @@ const Header: React.FC = () => {
           </Space>
         </Dropdown>
       </div>
+
+      {/* AI设置弹窗 */}
+      <Modal
+        title="AI模型设置"
+        open={showAISettings}
+        onCancel={() => setShowAISettings(false)}
+        footer={null}
+        width={600}
+      >
+        <AIModelSelector />
+      </Modal>
     </AntHeader>
   );
 };
