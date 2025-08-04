@@ -24,7 +24,7 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import { generateDemoRecommendations } from '../../data/demoAnswers';
-import { aiService } from '../../services/aiService';
+import { aiServiceManager } from '../../services/AIServiceManager';
 import { recommendationEngine, EnhancedRecommendation } from '../../services/recommendationEngine';
 
 const { Title, Text, Paragraph } = Typography;
@@ -81,31 +81,25 @@ const RecommendationGenerator: React.FC<RecommendationGeneratorProps> = ({
       
       try {
         setCurrentStep('AI正在生成个性化建议...');
-        enhancedRecommendations = await recommendationEngine.generateRecommendations({
-          industryAnalysis: industryResults,
-          companyAnalysis: companyResults,
-          documentData,
-          searchData,
-          preferences: {
-            focusAreas: ['智能化', '节能环保', '市场拓展'],
-            timeHorizon: 'medium',
-            riskTolerance: 'medium',
-            budgetRange: 'medium',
-            priorityType: 'innovation'
+        
+        // 使用新的AI服务管理器生成分析报告
+        const analysisData = {
+          industryAnswers: industryResults?.answers || {},
+          companyAnswers: companyResults?.answers || {},
+          companyInfo: {
+            name: companyResults?.companyName || '广东格绿朗节能科技有限公司',
+            industry: industryResults?.industry || '遮阳蓬行业',
+            size: '中型企业',
+            location: '广东省'
           }
-        });
+        };
+
+        const analysisReport = await aiServiceManager.generateAnalysis(analysisData);
+        enhancedRecommendations = analysisReport.recommendations;
+        
       } catch (error) {
-        console.error('增强建议生成失败，使用基础AI建议:', error);
-        try {
-          const aiResults = await aiService.generatePersonalizedRecommendations(
-            industryResults, 
-            companyResults
-          );
-          enhancedRecommendations = aiResults;
-        } catch (fallbackError) {
-          console.error('AI建议生成也失败，使用演示数据:', fallbackError);
-          enhancedRecommendations = generateDemoRecommendations(industryResults, companyResults);
-        }
+        console.error('AI分析生成失败，使用演示数据:', error);
+        enhancedRecommendations = generateDemoRecommendations(industryResults, companyResults);
       }
     
     // 使用增强的建议结果
@@ -294,16 +288,14 @@ const RecommendationGenerator: React.FC<RecommendationGeneratorProps> = ({
               className="max-w-md mx-auto"
             />
             
-            {aiService.isAvailable() && (
-              <Alert
-                message="AI增强模式"
-                description="正在使用人工智能技术分析您的数据，生成个性化建议"
-                type="info"
-                showIcon
-                icon={<RobotOutlined />}
-                className="max-w-md mx-auto"
-              />
-            )}
+            <Alert
+              message="AI增强模式"
+              description="正在使用人工智能技术分析您的数据，生成个性化建议"
+              type="info"
+              showIcon
+              icon={<RobotOutlined />}
+              className="max-w-md mx-auto"
+            />
           </div>
         </Card>
       </div>
@@ -330,11 +322,9 @@ const RecommendationGenerator: React.FC<RecommendationGeneratorProps> = ({
           message={
             <div className="flex items-center space-x-2">
               <span>建议生成完成</span>
-              {aiService.isAvailable() && (
-                <Tag icon={<RobotOutlined />} color="blue" size="small">
-                  AI增强
-                </Tag>
-              )}
+              <Tag icon={<RobotOutlined />} color="blue" size="small">
+                AI增强
+              </Tag>
             </div>
           }
           description={`基于${industryResults?.industry || '遮阳蓬'}行业分析和${companyResults?.companyName || '企业'}分析，已生成${recommendations.length}项个性化研发建议。`}

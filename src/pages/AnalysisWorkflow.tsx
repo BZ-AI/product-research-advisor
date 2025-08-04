@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Steps, Card, Button, Typography, message, Tabs } from 'antd';
+import React, { useState, useEffect } from 'react';
+import { Steps, Card, Button, Typography, message, Tabs, Badge } from 'antd';
 import { 
   SearchOutlined, 
   BuildOutlined, 
@@ -7,7 +7,8 @@ import {
   CheckCircleOutlined,
   FileTextOutlined,
   GlobalOutlined,
-  RobotOutlined
+  RobotOutlined,
+  SettingOutlined
 } from '@ant-design/icons';
 import IndustryAnalysisQA from '../components/analysis/IndustryAnalysisQA';
 import CompanyAnalysisQA from '../components/analysis/CompanyAnalysisQA';
@@ -15,6 +16,8 @@ import RecommendationGenerator from '../components/analysis/RecommendationGenera
 import QuickDemo from '../components/analysis/QuickDemo';
 import DocumentUpload from '../components/analysis/DocumentUpload';
 import IntelligentSearch from '../components/analysis/IntelligentSearch';
+import { AIConfigModal } from '../components/common/AIConfigModal';
+import { aiServiceManager } from '../services/AIServiceManager';
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -27,10 +30,37 @@ const AnalysisWorkflow: React.FC = () => {
   const [showDemo, setShowDemo] = useState(true); // 默认显示演示
   const [documentData, setDocumentData] = useState<any[]>([]);
   const [searchData, setSearchData] = useState<any>(null);
+  const [showAIConfig, setShowAIConfig] = useState(false);
+  const [aiServiceStatus, setAiServiceStatus] = useState<any>(null);
 
   // 预设的企业信息
   const companyName = "广东格绿朗节能科技有限公司";
   const industry = "遮阳蓬行业";
+
+  useEffect(() => {
+    initializeAIService();
+  }, []);
+
+  const initializeAIService = async () => {
+    try {
+      await aiServiceManager.initialize();
+      const status = aiServiceManager.getServiceStatus();
+      setAiServiceStatus(status);
+      
+      // 如果没有配置AI服务，显示配置提示
+      if (!status.isOnline || status.currentProvider === '演示模式') {
+        // 可以选择自动显示配置弹窗，或者让用户手动点击
+        // setShowAIConfig(true);
+      }
+    } catch (error) {
+      console.error('AI服务初始化失败:', error);
+    }
+  };
+
+  const handleAIConfigured = async () => {
+    await initializeAIService();
+    message.success('AI服务配置成功！现在可以享受真实的AI分析了');
+  };
 
   const handleDemoComplete = (demoResults: any) => {
     setIndustryResults(demoResults.industryResults);
@@ -220,6 +250,31 @@ const AnalysisWorkflow: React.FC = () => {
         <Text type="secondary" className="text-lg">
           基于AI驱动的行业分析和企业诊断，生成个性化研发建议
         </Text>
+        
+        {/* AI服务状态显示 */}
+        <div className="mt-4 flex justify-center items-center space-x-4">
+          {aiServiceStatus && (
+            <div className="flex items-center space-x-2">
+              <Badge 
+                status={aiServiceStatus.isOnline && aiServiceStatus.currentProvider !== '演示模式' ? 'processing' : 'default'} 
+                text={
+                  <span className="text-sm">
+                    当前模式: {aiServiceStatus.currentProvider}
+                    {aiServiceStatus.currentProvider === '演示模式' && ' (免费体验)'}
+                  </span>
+                }
+              />
+              <Button 
+                size="small" 
+                icon={<SettingOutlined />}
+                onClick={() => setShowAIConfig(true)}
+                type={aiServiceStatus.currentProvider === '演示模式' ? 'primary' : 'default'}
+              >
+                {aiServiceStatus.currentProvider === '演示模式' ? '启用真实AI' : 'AI设置'}
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* 步骤导航 */}
@@ -340,6 +395,13 @@ const AnalysisWorkflow: React.FC = () => {
           </div>
         </Card>
       )}
+
+      {/* AI配置弹窗 */}
+      <AIConfigModal
+        visible={showAIConfig}
+        onClose={() => setShowAIConfig(false)}
+        onConfigured={handleAIConfigured}
+      />
     </div>
   );
 };

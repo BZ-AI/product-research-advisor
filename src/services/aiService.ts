@@ -1,3 +1,5 @@
+import { config, isFeatureEnabled } from '../config';
+
 // AI服务层 - 集成大语言模型API
 export interface AIServiceConfig {
   apiKey?: string;
@@ -26,16 +28,16 @@ export class AIService {
   private config: AIServiceConfig;
   private isDemo: boolean;
 
-  constructor(config: AIServiceConfig = {}) {
+  constructor(serviceConfig: AIServiceConfig = {}) {
     this.config = {
-      apiKey: config.apiKey || process.env.REACT_APP_OPENAI_API_KEY || 'your-api-key-here',
-      baseURL: config.baseURL || this.getBaseURL(config.model || 'gpt-3.5-turbo'),
-      model: config.model || 'gpt-3.5-turbo', // 使用更便宜的模型
-      ...config
+      apiKey: serviceConfig.apiKey || 'your-api-key-here',
+      baseURL: serviceConfig.baseURL || this.getBaseURL(serviceConfig.model || 'gpt-3.5-turbo'),
+      model: serviceConfig.model || 'gpt-3.5-turbo', // 使用更便宜的模型
+      ...serviceConfig
     };
     
-    // MVP版本：优先使用真实AI，API密钥可以后台配置
-    this.isDemo = false; // 强制启用真实AI模式
+    // 使用配置文件中的设置
+    this.isDemo = config.demoMode || !isFeatureEnabled('ai');
   }
 
   // 根据模型自动选择API端点
