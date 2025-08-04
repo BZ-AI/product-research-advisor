@@ -24,7 +24,7 @@ import {
   ReloadOutlined
 } from '@ant-design/icons';
 import { generateDemoRecommendations } from '../../data/demoAnswers';
-import { aiServiceManager } from '../../services/AIServiceManager';
+import { aiService } from '../../services/aiService';
 import { recommendationEngine, EnhancedRecommendation } from '../../services/recommendationEngine';
 
 const { Title, Text, Paragraph } = Typography;
@@ -82,23 +82,20 @@ const RecommendationGenerator: React.FC<RecommendationGeneratorProps> = ({
       try {
         setCurrentStep('AI正在生成个性化建议...');
         
-        // 使用新的AI服务管理器生成分析报告
-        const analysisData = {
-          industryAnswers: industryResults?.answers || {},
-          companyAnswers: companyResults?.answers || {},
-          companyInfo: {
-            name: companyResults?.companyName || '广东格绿朗节能科技有限公司',
-            industry: industryResults?.industry || '遮阳蓬行业',
-            size: '中型企业',
-            location: '广东省'
-          }
-        };
-
-        const analysisReport = await aiServiceManager.generateAnalysis(analysisData);
-        enhancedRecommendations = analysisReport.recommendations;
+        // 使用基础AI服务生成建议
+        try {
+          const aiResults = await aiService.generatePersonalizedRecommendations(
+            industryResults, 
+            companyResults
+          );
+          enhancedRecommendations = aiResults;
+        } catch (aiError) {
+          console.error('AI建议生成失败，使用演示数据:', aiError);
+          enhancedRecommendations = generateDemoRecommendations(industryResults, companyResults);
+        }
         
       } catch (error) {
-        console.error('AI分析生成失败，使用演示数据:', error);
+        console.error('建议生成失败，使用演示数据:', error);
         enhancedRecommendations = generateDemoRecommendations(industryResults, companyResults);
       }
     

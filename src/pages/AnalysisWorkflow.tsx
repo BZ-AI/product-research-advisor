@@ -16,8 +16,7 @@ import RecommendationGenerator from '../components/analysis/RecommendationGenera
 import QuickDemo from '../components/analysis/QuickDemo';
 import DocumentUpload from '../components/analysis/DocumentUpload';
 import IntelligentSearch from '../components/analysis/IntelligentSearch';
-import { AIConfigModal } from '../components/common/AIConfigModal';
-import { aiServiceManager } from '../services/AIServiceManager';
+import { SimpleAIConfig } from '../components/common/SimpleAIConfig';
 
 const { Title, Text } = Typography;
 const { Step } = Steps;
@@ -38,28 +37,21 @@ const AnalysisWorkflow: React.FC = () => {
   const industry = "遮阳蓬行业";
 
   useEffect(() => {
-    initializeAIService();
+    // 简化初始化
+    setAiServiceStatus({
+      isOnline: true,
+      currentProvider: '演示模式',
+      availableProviders: ['演示模式']
+    });
   }, []);
 
-  const initializeAIService = async () => {
-    try {
-      await aiServiceManager.initialize();
-      const status = aiServiceManager.getServiceStatus();
-      setAiServiceStatus(status);
-      
-      // 如果没有配置AI服务，显示配置提示
-      if (!status.isOnline || status.currentProvider === '演示模式') {
-        // 可以选择自动显示配置弹窗，或者让用户手动点击
-        // setShowAIConfig(true);
-      }
-    } catch (error) {
-      console.error('AI服务初始化失败:', error);
-    }
-  };
-
-  const handleAIConfigured = async () => {
-    await initializeAIService();
+  const handleAIConfigured = () => {
     message.success('AI服务配置成功！现在可以享受真实的AI分析了');
+    setAiServiceStatus({
+      isOnline: true,
+      currentProvider: 'AI模式',
+      availableProviders: ['AI模式', '演示模式']
+    });
   };
 
   const handleDemoComplete = (demoResults: any) => {
@@ -397,7 +389,7 @@ const AnalysisWorkflow: React.FC = () => {
       )}
 
       {/* AI配置弹窗 */}
-      <AIConfigModal
+      <SimpleAIConfig
         visible={showAIConfig}
         onClose={() => setShowAIConfig(false)}
         onConfigured={handleAIConfigured}
