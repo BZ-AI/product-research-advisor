@@ -24,7 +24,7 @@ const AnalysisWorkflow: React.FC = () => {
   const [industryResults, setIndustryResults] = useState<any>(null);
   const [companyResults, setCompanyResults] = useState<any>(null);
   const [recommendations, setRecommendations] = useState<any[]>([]);
-  const [showDemo, setShowDemo] = useState(false);
+  const [showDemo, setShowDemo] = useState(true); // 默认显示演示
   const [documentData, setDocumentData] = useState<any[]>([]);
   const [searchData, setSearchData] = useState<any>(null);
 
@@ -208,58 +208,72 @@ const AnalysisWorkflow: React.FC = () => {
         </Steps>
       </Card>
 
-      {/* AI功能介绍和快速演示选项 */}
+      {/* 欢迎页面 - 立即体验AI */}
       {currentStep === 0 && !showDemo && (
-        <div className="space-y-4">
-          {/* AI功能介绍 */}
-          <Card className="bg-gradient-to-r from-blue-50 to-green-50 border-blue-200">
-            <div className="flex items-center space-x-4">
-              <RobotOutlined className="text-4xl text-blue-500" />
-              <div className="flex-1">
-                <Title level={4} className="mb-2 text-blue-700">
-                  🤖 AI增强分析功能
-                </Title>
-                <Text className="text-blue-600 block mb-2">
-                  系统集成了多种AI功能，为您提供智能化的分析体验：
-                </Text>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-3">
-                  <div className="flex items-center space-x-2">
-                    <FileTextOutlined className="text-green-500" />
-                    <Text className="text-sm">智能文档解析</Text>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <GlobalOutlined className="text-orange-500" />
-                    <Text className="text-sm">AI搜索分析</Text>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <BulbOutlined className="text-purple-500" />
-                    <Text className="text-sm">个性化建议生成</Text>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </Card>
+        <div className="text-center space-y-8 py-12">
+          {/* 主标题 */}
+          <div>
+            <Title level={1} className="text-4xl font-bold text-gray-800 mb-4">
+              🤖 AI产品研发建议平台
+            </Title>
+            <Text className="text-xl text-gray-600 block mb-2">
+              专为遮阳蓬行业定制的智能分析系统
+            </Text>
+            <Text className="text-lg text-blue-600">
+              3秒钟体验完整AI分析流程，获得专业研发建议
+            </Text>
+          </div>
 
-          {/* 快速演示选项 */}
-          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 border-purple-200">
-            <div className="flex items-center justify-between">
-              <div>
-                <Title level={4} className="mb-2 text-purple-700">
-                  🚀 快速体验模式
-                </Title>
-                <Text className="text-purple-600">
-                  使用预设数据快速体验完整分析流程，了解系统功能和AI建议效果
-                </Text>
-              </div>
-              <Button
-                type="primary"
-                size="large"
-                onClick={() => setShowDemo(true)}
-                className="bg-gradient-to-r from-purple-500 to-pink-600 border-0"
-              >
-                快速演示
-              </Button>
+          {/* 核心功能展示 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <RobotOutlined className="text-4xl text-blue-500 mb-3" />
+              <Title level={4}>AI智能分析</Title>
+              <Text className="text-gray-600">
+                实时AI分析用户回答，提供专业建议
+              </Text>
+            </Card>
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <FileTextOutlined className="text-4xl text-green-500 mb-3" />
+              <Title level={4}>文档智能解析</Title>
+              <Text className="text-gray-600">
+                支持PDF、Word、图片等格式AI解析
+              </Text>
+            </Card>
+            <Card className="text-center hover:shadow-lg transition-shadow">
+              <BulbOutlined className="text-4xl text-purple-500 mb-3" />
+              <Title level={4}>个性化建议</Title>
+              <Text className="text-gray-600">
+                多维度评估，生成定制化研发建议
+              </Text>
+            </Card>
+          </div>
+
+          {/* 立即体验按钮 */}
+          <div className="space-y-4">
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => setShowDemo(true)}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 border-0 px-12 py-6 text-xl h-auto"
+            >
+              🚀 立即免费体验AI分析
+            </Button>
+            <div>
+              <Text className="text-gray-500">
+                无需注册 • 3秒体验 • 专业建议
+              </Text>
             </div>
+          </div>
+
+          {/* 客户案例 */}
+          <Card className="max-w-2xl mx-auto bg-gradient-to-r from-green-50 to-blue-50">
+            <Title level={5} className="text-center mb-3">
+              ✨ 为广东格绿朗节能科技有限公司定制
+            </Title>
+            <Text className="text-center text-gray-600">
+              基于遮阳蓬行业深度分析，提供专业的产品研发建议和实施方案
+            </Text>
           </Card>
         </div>
       )}
