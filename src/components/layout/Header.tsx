@@ -2,6 +2,7 @@ import React from 'react';
 import { Layout, Button, Avatar, Dropdown, Space, Badge } from 'antd';
 import { BellOutlined, UserOutlined, SettingOutlined, LogoutOutlined } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
+import AIStatusIndicator from '../common/AIStatusIndicator';
 
 const { Header: AntHeader } = Layout;
 
@@ -30,10 +31,11 @@ const Header: React.FC = () => {
 
   return (
     <AntHeader className="bg-white shadow-sm px-6 flex items-center justify-between">
-      <div className="flex items-center">
+      <div className="flex items-center space-x-4">
         <h1 className="text-xl font-semibold text-gray-800 m-0">
           产品研发建议平台
         </h1>
+        <AIStatusIndicator />
       </div>
       
       <div className="flex items-center space-x-4">
